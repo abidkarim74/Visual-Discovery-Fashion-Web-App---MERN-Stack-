@@ -4,14 +4,20 @@ import { io } from "../socket/socketio.js";
 
 export const sendNotificationService = (
   newNotifcation: any,
-  receiverId: string,
+  receiverId: any,
 ) => {
   setImmediate(() => {
-    const receiverSocketId = receiverId
-      ? getReceivedSocketId(receiverId)
-      : null;
+    console.log('To Here...', receiverId);
 
-    if (receiverSocketId)
+    const receiverSocketId = receiverId
+      ? getReceivedSocketId(receiverId._id)
+      : null;
+    
+    console.log('ID: ', receiverSocketId)
+
+    if (receiverSocketId) {
+      console.log('Notification sent!')
       io.to(receiverSocketId).emit("newNotification", newNotifcation);
+    }
   });
 };

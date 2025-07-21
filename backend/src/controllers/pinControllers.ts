@@ -4,16 +4,12 @@ import { Pin } from "../schemas/Pins.js";
 import mongoose from "mongoose";
 import User from "../schemas/User.js";
 
-export const pinsListFunc = async (
-  req: AuthenticatedRequest,
-  res: Response
-) => {
+
+export const pinsListFunc = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const authUser = req.user;
     if (!authUser) {
-      res
-        .status(401)
-        .json({ error: "You are not authorized to perform this action!" });
+      res.status(401).json({ error: "You are not authorized to perform this action!" });
       return;
     }
     const page: number = Math.max(parseInt(req.query.page as string) || 1, 1);
@@ -30,9 +26,6 @@ export const pinsListFunc = async (
         .limit(limit),
       Pin.countDocuments(),
     ]);
-
-    console.log(pins);
-
     res.status(200).json({
       pins,
       totalPins,
@@ -42,25 +35,18 @@ export const pinsListFunc = async (
     });
   } catch (err: any) {
     console.error(err);
-    res
-      .status(500)
-      .json({ error: "Internal server error while fetching the pins!" });
+    res.status(500).json({ error: "Internal server error while fetching the pins!" });
   }
 };
 
-export const pinCreateFunc = async (
-  req: AuthenticatedRequest,
-  res: Response
-) => {
+
+export const pinCreateFunc = async (req: AuthenticatedRequest,res: Response) => {
   try {
     if (!req.user) {
-      res
-        .status(401)
-        .json({ error: "You are not authenticated to perform this task!" });
+      res.status(401).json({ error: "You are not authenticated to perform this task!" });
       return;
     }
     const { tags, caption } = req.body;
-
     if (!req.file) {
       res.status(403).json({ error: "No file exist in the request body" });
       return;
@@ -80,11 +66,10 @@ export const pinCreateFunc = async (
     res.status(200).json(newPin);
   } catch (err: any) {
     console.log(err.message);
-    res
-      .status(500)
-      .json({ error: "Internal server error while creating a pin!" });
+    res.status(500).json({ error: "Internal server error while creating a pin!" });
   }
 };
+
 
 export const makePins = async (req: Request, res: Response) => {
   try {
@@ -183,24 +168,37 @@ export const makePins = async (req: Request, res: Response) => {
   }
 };
 
-export const pinDetailFunc = async (
-  req: AuthenticatedRequest,
-  res: Response
-) => {
+
+export const pinDetailFunc = async (req: AuthenticatedRequest,res: Response) => {
   try {
     if (!req.user) {
-      res
-        .status(401)
-        .json({ error: "You are not authorized to perform this task!" });
+      res.status(401).json({ error: "You are not authorized to perform this task!" });
       return;
     }
-    await mongoose.connection.dropDatabase();
+    const id = req.params.id;
+    const pin = await Pin.findById(id);
 
-    res.status(200).json("Done");
+    res.status(200).json(pin);
+
   } catch (err: any) {
     console.error("Error in pinDetailFunc:", err.message);
-    res
-      .status(500)
-      .json({ error: "Internal server error while fetching Pin!" });
+    res.status(500).json({ error: "Internal server error while fetching Pin!" });
   }
 };
+
+
+export const authUserPinsFunc = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    if (!req.user) {
+      res.status(401).json({ error: 'You are not authorized to perform this task!' });
+      return;
+    }
+    const pins = await Pin.find({ "creator._id": req?.user?.id });
+    console.log(pins);
+    res.status(200).json(pins);
+
+  } catch (err: any) {
+    console.log(err.message);
+    res.status(500).json({ error: 'Internal server error while fetching pins!' });
+  }
+}

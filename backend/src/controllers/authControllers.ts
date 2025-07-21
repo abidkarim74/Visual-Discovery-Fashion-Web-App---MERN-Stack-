@@ -181,3 +181,5 @@ export const logoutFunc = async (req: AuthenticatedRequest, res: Response) => {
     res.status(500).json({ error: 'Internal server error while logging out!' });
   }
 }
+
+
