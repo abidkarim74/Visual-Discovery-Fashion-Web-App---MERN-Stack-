@@ -55,7 +55,7 @@ export const getRequest = async (
 
     return res.data;
   } catch (err: any) {
-    const errorMsg = err.response?.data?.error || "Something went wrong";
+    const errorMsg = err.response?.data?.error;
     setError?.(errorMsg);
     return null;
   } finally {

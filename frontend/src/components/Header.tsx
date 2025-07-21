@@ -36,7 +36,7 @@ const Header = () => {
 
       <div className="relative flex items-center space-x-2 cursor-pointer">
         <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center text-sm font-semibold text-white">
-          <Link to={`/${auth.user?.username}/profile`}>P</Link>
+          <Link to={`/${auth.user?.username}/profile`}>{auth?.user?.profilePic ? <img src={`http://localhost:8080${auth.user.profilePic}`}></img> : <p>{auth.user?.firstname[0] }</p> }</Link>
           
         </div>
         <ChevronDown className={`transition-transform ${isOpen ? "rotate-180" : ""}`} onClick={handleOpen} />

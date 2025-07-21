@@ -101,7 +101,7 @@ const HomePage = () => {
             <div className="relative">
               <LazyLoadImage
                 effect="blur"
-                src={`${pin.image}`}
+                src={`http://localhost:8080${pin.image}`}
                 alt={pin.caption}
                 className="w-full h-auto object-cover rounded-lg transform group-hover:scale-105 transition-transform duration-300"
               />

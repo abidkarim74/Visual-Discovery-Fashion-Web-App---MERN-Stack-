@@ -4,6 +4,7 @@ import { useContext, useEffect, useState } from "react";
 import MainLoading from "./sub/MainLoading";
 import NotificationContext from "../context/notificationContext";
 
+
 const formatTime = (dateStr: string) => {
   const now = new Date();
   const date = new Date(dateStr);
@@ -45,10 +46,17 @@ const NotificationBar = () => {
     setError(null);
 
     const res = await getRequest(endpoint, setLoading, setError);
+    
 
-    console.log(res);
-
-    if (res) setNotifications(res);
+    if (res) {
+      for (let i = 0; i < res.length; i++) {
+        if (res[i].target === auth.user?.id) {
+          notificationContext.setChecker(true);
+        }
+      }
+      console.log(res);
+      setNotifications(res);
+    }
   };
 
   useEffect(() => {

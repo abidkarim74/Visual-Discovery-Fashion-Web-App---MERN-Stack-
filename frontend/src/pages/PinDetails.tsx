@@ -17,12 +17,8 @@ const PinDetails = () => {
     const fetchPinDetail = async () => {
       setLoading(true);
       const res = await getRequest(endpoint, setLoading, setError);
-
-      // const userDetailEndpoint = '/profiles/user-info';
-
-      // const user = await getRequest(userDetailEndpoint, setLoading, setError);
+      console.log("Pin: ", res);
       setPin(res);
-
     };
 
     if (auth) fetchPinDetail();
@@ -33,22 +29,24 @@ const PinDetails = () => {
   if (!pin) return null;
 
   return (
-    <div className="flex justify-center items-start p-4 bg-gray-100 min-h-screen">
-      <div className="max-w-2xl w-full bg-white rounded-2xl shadow-lg overflow-hidden">
+    <div className="flex justify-center px-4 py-8 bg-[#f8f8f8] min-h-screen">
+      <div className="w-full max-w-3xl bg-white rounded-3xl shadow-xl overflow-hidden transition-transform duration-300 hover:scale-[1.01]">
         <img
-          src={pin.image}
+          src={`http://localhost:8080${pin.image}`}
           alt={pin.caption}
-          className="w-full h-auto object-cover"
+          className="w-full h-[300px] sm:h-[400px] md:h-[500px] object-cover"
         />
-        <div className="p-6">
-          <h1 className="text-2xl font-bold text-gray-800 mb-2">{pin.caption}</h1>
-          
-          {pin.tags && pin.tags.length > 0 && (
+        <div className="p-4 sm:p-6">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 mb-3">
+            {pin.caption}
+          </h1>
+
+          {pin.tags?.length > 0 && (
             <div className="flex flex-wrap gap-2 mb-4">
               {pin.tags.map((tag: string, index: number) => (
                 <span
                   key={index}
-                  className="bg-gray-200 text-gray-600 px-3 py-1 rounded-full text-sm font-medium"
+                  className="bg-[#efefef] text-gray-700 px-4 py-1 rounded-full text-sm font-medium shadow-sm"
                 >
                   #{tag}
                 </span>
@@ -56,9 +54,10 @@ const PinDetails = () => {
             </div>
           )}
 
-          <div className="text-sm text-gray-500">
+          <div className="text-sm text-gray-500 space-y-2">
             <p>
-              <span className="font-semibold">Created by:</span> {pin.creator}
+              <span className="font-semibold">Created by:</span>{" "}
+              <span className="text-gray-700">{pin.creator?.username || "Unknown"}</span>
             </p>
             <p>
               <span className="font-semibold">Posted on:</span>{" "}
