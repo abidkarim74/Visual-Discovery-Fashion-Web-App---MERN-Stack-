@@ -67,7 +67,7 @@ const AuthProfilePage = () => {
 
         {followerOpen && <FolowersList isOpen={followerOpen} setIsOpen={setFollowerOpen}></FolowersList>}
 
-        {followingOpen && <FollowingsList isOpen={followerOpen} setIsOpen={setFollowerOpen}></FollowingsList>}
+        {followingOpen && <FollowingsList isOpen={followingOpen} setIsOpen={setFollowingOpen}></FollowingsList>}
 
         <div className="flex gap-4 mt-4">
           <button className="px-5 py-2 text-sm font-medium text-white bg-indigo-500 hover:bg-indigo-600 transition rounded-full shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-300">

@@ -4,14 +4,14 @@ import MainLoading from "../components/sub/MainLoading";
 import { getRequest, postRequest } from "../api/apiRequests";
 import { useParams, useNavigate } from "react-router-dom";
 import StartChatBox from "../components/sub/StartChatBox";
+import { Link } from "react-router-dom";
 
 
 const UserProfilePage = () => {
   const auth = useContext(AuthContext);
-  
+
   if (!auth) {
-    return <MainLoading />; 
-    
+    return <MainLoading />;
   }
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -60,13 +60,18 @@ const UserProfilePage = () => {
   const handleToggleFollow = async (targetUserId: string) => {
     const endpoint = "/profiles/toogle-follow";
 
-    const res = await postRequest(endpoint, { targetUserId }, setLoading, setError);
+    const res = await postRequest(
+      endpoint,
+      { targetUserId },
+      setLoading,
+      setError
+    );
 
     if (res) {
       if (res.followed) {
-        setFollowersCount(prev => prev + 1);
+        setFollowersCount((prev) => prev + 1);
       } else {
-        setFollowersCount(prev => prev - 1);
+        setFollowersCount((prev) => prev - 1);
       }
       setFollowing(() => {
         return !following;
@@ -78,6 +83,21 @@ const UserProfilePage = () => {
 
   const [message, setMessage] = useState<string>("");
   const [messageOpen, setMessageOpen] = useState<boolean>(false);
+
+  const [pins, setPins] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchUserCreation = async () => {
+      const endpoint1 = "/profiles/created/" + user.id;
+
+      const res = await getRequest(endpoint1, setLoading, setError);
+
+      if (res) {
+        setPins(res);
+      }
+    };
+    fetchUserCreation();
+  }, [auth, user]);
 
   if (!user) return <MainLoading />;
 
@@ -115,14 +135,14 @@ const UserProfilePage = () => {
           {auth.user?.username !== user?.username && (
             <div className="relative flex flex-wrap gap-4 justify-center mt-6">
               <button
-                className="px-4 py-1 text-sm border border-gray-300 rounded-full bg-white hover:bg-gray-100 transition shadow-sm"
+                className="px-4 py-1 text-sm border border-gray-700 rounded-full bg-black hover:bg-gray-900 text-white transition shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled={loading}
               >
                 Share
               </button>
 
               <button
-                className="px-4 py-1 text-sm font-medium border border-indigo-500 text-indigo-600 rounded-full bg-white hover:bg-indigo-50 transition-colors duration-200 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-1 text-sm font-medium border border-indigo-600 text-white rounded-full bg-indigo-600 hover:bg-indigo-700 transition-colors duration-200 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled={loading}
                 type="button"
                 onClick={() => setMessageOpen((prev) => !prev)}
@@ -133,7 +153,7 @@ const UserProfilePage = () => {
               <button
                 className={`px-4 py-1 text-sm rounded-full transition shadow-sm ${
                   following
-                    ? "bg-red-100 text-red-600 border border-red-300 hover:bg-red-200"
+                    ? "bg-[#dc143c1a] text-[#dc143c] border border-[#dc143c66] hover:bg-[#dc143c33]"
                     : "bg-indigo-100 text-indigo-700 border border-indigo-300 hover:bg-indigo-200"
                 }`}
                 type="button"
@@ -160,13 +180,29 @@ const UserProfilePage = () => {
           <h3 className="text-center text-2xl font-semibold text-indigo-700 border-b pb-2 mb-4">
             {user.firstname} Creations
           </h3>
-          <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4"></div>
 
-          {!loading && auth && (
-            <p className="text-center text-gray-500 mt-10">
-              {user.firstname} hasn't created any pins yet.
-            </p>
-          )}
+          <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
+            {!loading && pins.length > 0
+              ? pins.map((pin:any) => (
+                <Link
+                    key={pin._id}
+                    to={`/pins/${pin._id}`}
+                    className="block overflow-hidden rounded-2xl border border-gray-700 hover:shadow-md transition"
+                  >
+                    <img
+                      src={`http://localhost:8080${pin.image}`}
+                      alt="Pin"
+                      className="w-full rounded-2xl hover:opacity-90 transition"
+                    />
+                  </Link>
+                ))
+              : !loading &&
+                auth && (
+                  <p className="text-center text-gray-500 mt-10">
+                    {user.firstname} hasn't created any pins yet.
+                  </p>
+                )}
+          </div>
         </div>
       </div>
     </div>

@@ -39,7 +39,7 @@ const FollowersList: React.FC<Props> = ({ isOpen, setIsOpen }) => {
 
   return (
     <div className="fixed inset-0 z-40 flex items-center justify-center backdrop-blur-sm bg-black/30">
-      <div className="bg-white p-6 rounded-2xl shadow-xl w-full max-w-md">
+      <div className="bg-white p-6 rounded-2xl shadow-xl w-[95%] max-w-md">
         <h3 className="text-xl font-semibold text-center mb-4">Followers</h3>
 
         {loading && (

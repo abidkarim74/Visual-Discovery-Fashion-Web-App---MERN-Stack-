@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import User from "../schemas/User.js";
 import { AuthenticatedRequest } from "../interfaces/AuthInterface.js";
 import { GeneralUser } from "../interfaces/ProfileInterface.js";
+import { Pin } from "../schemas/Pins.js";
 
 
 export const userProfileFunc = async (req: Request, res: Response) => {
@@ -224,4 +225,22 @@ export const followingListFunc = async (req: AuthenticatedRequest, res: Response
       error: "Internal server error while while fetching followers list!",
     });
   } 
+}
+
+
+export const profilePinsFunc = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    if (!req.user) {
+      res.status(401).json({ error: 'You are not authorized to perform this task!' });
+      return;
+    }
+    const userId = req.params.userId;
+    
+    const createdPins = await Pin.find({ 'creator._id': userId }).sort('-createdAt');
+    res.status(200).json(createdPins);
+    
+  } catch (err: any) {
+    console.log(err.message);
+    res.status(500).json({ error: 'Internal server error while fetching profile pins!' });
+  }
 }
