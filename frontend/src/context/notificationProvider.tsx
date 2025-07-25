@@ -44,9 +44,9 @@ const NotificationProvider = ({ children }: { children: React.ReactNode }) => {
       const res = await getRequest(endpoint, null, null);
 
       const unreadCount = res ?? 0;
-      if (checker) {
+      // if (checker) {
         setCount(unreadCount);
-      }
+      // }
     };
 
     countUnreadNotifications();

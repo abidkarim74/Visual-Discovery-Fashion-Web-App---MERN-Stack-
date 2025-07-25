@@ -3,6 +3,7 @@ import "./App.css";
 import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
 import BottomBar from "./components/BottomBar";
+import UnauthenticatedHeader from "./components/UnauthenticatedHeader";
 
 // Other
 import { Route, Routes } from "react-router-dom";
@@ -18,18 +19,33 @@ import UserProfilePage from "./pages/UsersProfilePage";
 import CreatePinPage from "./pages/CreatePinPage";
 import ProfileUpdatePage from "./pages/ProfileUpdatePage";
 import PinDetails from "./pages/PinDetails";
+import SettingsPage from "./pages/SettingsPage";
+import { AuthContext } from "./context/authContext";
+import { useContext } from "react";
+import MainLoading from "./components/sub/MainLoading";
+import CreatedPage from "./pages/CreatedPage";
+import SavedPage from "./pages/SavedPage";
 
 
 function App() {
+  const auth = useContext(AuthContext);
+
+  if (!auth) {
+    return <MainLoading></MainLoading>;
+  }
   const { width } = useWindowSize();
   return (
     <div className="flex flex-col h-screen">
-      <header className="h-16 bg-white border-b shadow-sm px-4 flex items-center sticky top-0 z-50">
-        <Header />
-      </header>
+      {auth.user ? (
+        <header className="h-16 bg-white border-b shadow-sm px-4 flex items-center sticky top-0 z-50">
+          <Header />
+        </header>
+      ) : (
+        <UnauthenticatedHeader></UnauthenticatedHeader>
+      )}
 
       <div className="flex flex-1 overflow-hidden">
-        {width > 470 ? <Sidebar /> : null}
+        {auth.user && <>{width > 470 ? <Sidebar /> : null}</>}
 
         <main className="flex-1 overflow-y-auto  p-4">
           <Routes>
@@ -73,7 +89,19 @@ function App() {
                 </ProtectRoutes>
               }
             ></Route>
-            <Route path='/pins/:id' element={<PinDetails></PinDetails>}></Route>
+            <Route
+              path="/pins/created"
+              element={<ProtectRoutes><CreatedPage></CreatedPage></ProtectRoutes>}
+            ></Route>
+            <Route
+              path="/pins/saved"
+              element={<ProtectRoutes><SavedPage></SavedPage></ProtectRoutes>}
+            ></Route>
+            <Route
+              path="/settings"
+              element={<SettingsPage></SettingsPage>}
+            ></Route>
+            <Route path="/pins/:id" element={<PinDetails></PinDetails>}></Route>
             <Route
               path="/:username/update-profile"
               element={
@@ -94,7 +122,7 @@ function App() {
         </main>
       </div>
 
-      {width <= 470 && <BottomBar></BottomBar>}
+      {auth.user && width <= 470 && <BottomBar></BottomBar>}
     </div>
   );
 }

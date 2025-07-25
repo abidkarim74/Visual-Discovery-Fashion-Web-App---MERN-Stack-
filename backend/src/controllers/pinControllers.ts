@@ -193,8 +193,7 @@ export const authUserPinsFunc = async (req: AuthenticatedRequest, res: Response)
       res.status(401).json({ error: 'You are not authorized to perform this task!' });
       return;
     }
-    const pins = await Pin.find({ "creator._id": req?.user?.id });
-    console.log(pins);
+    const pins = await Pin.find({ "creator._id": req?.user?.id }).sort('-createdAt');
     res.status(200).json(pins);
 
   } catch (err: any) {

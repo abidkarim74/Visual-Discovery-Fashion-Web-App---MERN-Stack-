@@ -6,14 +6,12 @@ import MainLoading from "./MainLoading";
 import { ImArrowLeft } from "react-icons/im";
 import MessageContext from "../../context/messageContext";
 
-
 interface Props {
   conversationId: string | null;
   setChat: (value: string | null) => void;
   receiverId: string | null;
   setReceiverId: (value: string | null) => void;
 }
-
 
 const Chats: React.FC<Props> = ({
   conversationId,
@@ -26,8 +24,6 @@ const Chats: React.FC<Props> = ({
   if (!auth) {
     return <MainLoading></MainLoading>;
   }
-
-  console.log("Here");
   const messageContext = useContext(MessageContext);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -62,6 +58,23 @@ const Chats: React.FC<Props> = ({
     );
   }
 
+  useEffect(() => {
+    const readMessagesFunc = async () => {
+      const endpoint = "/messages/read-chats";
+      setLoading(true);
+
+      const res = await postRequest(
+        endpoint,
+        { conversationId },
+        setLoading,
+        setError
+      );
+
+      console.log("Reading messages: ", res);
+    };
+    readMessagesFunc();
+  }, [auth]);
+
   const handleBack = (e: any) => {
     e.preventDefault();
     setChat(null);
@@ -70,20 +83,16 @@ const Chats: React.FC<Props> = ({
   const [text, setText] = useState("");
 
   const handleMessageSend = async (e: any) => {
-    const newMessage = {
-      
-    }
     console.log("Receiver ID: ", receiverId);
     e.preventDefault();
     setLoading(true);
     const endpoint = "/messages/send-message";
-    const res = await postRequest(
+    await postRequest(
       endpoint,
       { conversationId, text, receiverId },
       setLoading,
       setError
     );
-
     setText("");
   };
 
@@ -96,7 +105,8 @@ const Chats: React.FC<Props> = ({
   }, [messages]);
 
   return (
-    <div className="flex flex-col h-[80vh] border rounded-3xl overflow-hidden shadow-xl bg-white">
+    <div className="flex flex-col h-[80vh] border border-indigo-200 rounded-3xl overflow-hidden shadow-2xl bg-white">
+      {/* Top Bar */}
       <div className="flex items-center justify-between px-5 py-3 border-b bg-white shadow-sm">
         <div className="flex items-center gap-3">
           <button
@@ -116,11 +126,12 @@ const Chats: React.FC<Props> = ({
         </div>
       </div>
 
+      {/* Message Area */}
       <div
-        className="flex-1 overflow-y-auto px-5 py-4 space-y-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent"
+        className="notification-bar flex-1 overflow-y-auto px-5 py-4 space-y-4 scrollbar-thin scrollbar-thumb-indigo-300 scrollbar-track-transparent"
         ref={scrollContainerRef}
       >
-        <h3 className="text-center text-gray-400 text-sm italic py-2">
+        <h3 className="text-center text-gray-400 text-xs italic py-1">
           Enjoy your chat...
         </h3>
 
@@ -146,9 +157,9 @@ const Chats: React.FC<Props> = ({
               )}
 
               <div
-                className={`max-w-xs p-3 rounded-3xl shadow-sm transition-all duration-300 ${
+                className={`max-w-xs p-3 rounded-2xl shadow-sm transition-all duration-300 ${
                   isSender
-                    ? "bg-blue-100 text-gray-900 rounded-br-none"
+                    ? "bg-indigo-100 text-gray-900 rounded-br-none"
                     : "bg-gray-100 text-gray-800 rounded-bl-none"
                 }`}
               >
@@ -165,6 +176,7 @@ const Chats: React.FC<Props> = ({
         })}
       </div>
 
+      {/* Input Area */}
       <form
         className="bg-white px-5 py-3 flex items-center gap-3 border-t shadow-inner"
         onSubmit={(e) => {
@@ -176,13 +188,13 @@ const Chats: React.FC<Props> = ({
           placeholder="Type something nice…"
           value={text}
           onChange={(e: any) => setText(e.target.value)}
-          className="flex-1 px-4 py-2 bg-gray-100 rounded-full focus:outline-none focus:ring-2 focus:ring-rose-400 placeholder:text-sm transition-all"
+          className="flex-1 px-4 py-2 bg-gray-100 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 placeholder:text-gray-400 transition-all"
         />
 
         <button
           onClick={handleMessageSend}
           type="submit"
-          className="bg-rose-500 hover:bg-rose-600 text-white px-4 py-2 rounded-full text-sm transition"
+          className="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-full text-sm transition"
         >
           Send
         </button>

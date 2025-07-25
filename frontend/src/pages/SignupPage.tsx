@@ -1,130 +1,178 @@
 import { useState } from "react";
 import { postRequest } from "../api/apiRequests";
-import { useContext } from "react";
-import { AuthContext } from "../context/authContext";
-import MainLoading from "../components/sub/MainLoading";
 import { useNavigate } from "react-router-dom";
+import MainLoading from "../components/sub/MainLoading";
+import { AuthContext } from "../context/authContext";
+import { useContext } from "react";
 
-
-const SignupPage = () => {
-  const auth = useContext(AuthContext);
-
-  if (!auth) {
-    return <MainLoading></MainLoading>
-  }
-  const [loading, setLoading] = useState<boolean>(false);
-
-  const [formData, setFormData] = useState({
-    firstname: "",
-    lastname: "",
+const SignUpPage = () => {
+  const [form, setForm] = useState({
     username: "",
-    email: "",
+    firstName: "",
+    lastName: "",
     password: "",
     confirmPassword: "",
   });
-
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
+  const auth = useContext(AuthContext);
   const navigate = useNavigate();
+
+  if (!auth) {
+    return <MainLoading />;
+  }
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (formData.password !== formData.confirmPassword) {
+    if (
+      !form.username ||
+      !form.password ||
+      !form.confirmPassword ||
+      !form.firstName ||
+      !form.lastName
+    ) {
+      setError("All fields are required.");
+      return;
+    }
+
+    if (form.password !== form.confirmPassword) {
       setError("Passwords do not match.");
       return;
     }
-    setError("");
-    const endpoint = '/auth/signup';
-    const res = await postRequest(endpoint, formData, setLoading, setError);
-    auth.setAccessToken(res.accessToken);
-    auth.setLoading(false);
+
+    const endpoint = "/auth/signup";
+    const payload = {
+      username: form.username,
+      password: form.password,
+      firstName: form.firstName,
+      lastName: form.lastName,
+    };
+
+    const data = await postRequest(endpoint, payload, setLoading, setError);
+    auth.setAccessToken(data.accessToken);
     navigate("/");
   };
 
   return (
-    <div className="signup-page flex items-center justify-center min-h-screen bg-[#f8f8f8] px-4">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white p-8 rounded-3xl shadow-xl w-full max-w-lg space-y-5"
-      >
-        <h2 className="text-3xl font-bold text-center text-gray-800">Sign Up</h2>
+    <div className="h-full flex items-center justify-center p-4 from-indigo-100 to-indigo-300">
+      <div className="w-full max-w-md bg-white shadow-xl rounded-xl p-6 space-y-4">
+        <h2 className="text-xl font-semibold text-center text-indigo-700">
+          Join <span className="font-bold text-indigo-800">LumSpire</span>
+        </h2>
+        <h3 className="text-lg font-medium text-center text-gray-700">
+          Create your account
+        </h3>
 
-        <div className="flex space-x-4">
-          <input
-            type="text"
-            name="firstname"
-            placeholder="First name"
-            value={formData.firstname}
-            onChange={handleChange}
-            className="w-1/2 px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-400"
-            required
-          />
-          <input
-            type="text"
-            name="lastname"
-            placeholder="Last name"
-            value={formData.lastname}
-            onChange={handleChange}
-            className="w-1/2 px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-400"
-            required
-          />
+        {error && (
+          <div className="bg-red-100 text-red-700 px-3 py-2 rounded text-xs text-center">
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-3 text-sm">
+          <div>
+            <label htmlFor="username" className="block mb-1 text-gray-700">
+              Username
+            </label>
+            <input
+              name="username"
+              id="username"
+              type="text"
+              value={form.username}
+              onChange={handleChange}
+              placeholder="Enter your username"
+              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+            />
+          </div>
+
+          <div className="flex gap-3">
+            <div className="w-1/2">
+              <label htmlFor="firstName" className="block mb-1 text-gray-700">
+                First Name
+              </label>
+              <input
+                name="firstName"
+                id="firstName"
+                type="text"
+                value={form.firstName}
+                onChange={handleChange}
+                placeholder="First name"
+                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+              />
+            </div>
+            <div className="w-1/2">
+              <label htmlFor="lastName" className="block mb-1 text-gray-700">
+                Last Name
+              </label>
+              <input
+                name="lastName"
+                id="lastName"
+                type="text"
+                value={form.lastName}
+                onChange={handleChange}
+                placeholder="Last name"
+                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label htmlFor="password" className="block mb-1 text-gray-700">
+              Password
+            </label>
+            <input
+              name="password"
+              id="password"
+              type="password"
+              value={form.password}
+              onChange={handleChange}
+              placeholder="Enter a password"
+              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+            />
+          </div>
+
+          <div>
+            <label
+              htmlFor="confirmPassword"
+              className="block mb-1 text-gray-700"
+            >
+              Retype Password
+            </label>
+            <input
+              name="confirmPassword"
+              id="confirmPassword"
+              type="password"
+              value={form.confirmPassword}
+              onChange={handleChange}
+              placeholder="Confirm your password"
+              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 transition disabled:opacity-50"
+          >
+            {loading ? "Creating Account..." : "Sign Up"}
+          </button>
+        </form>
+
+        <div className="text-center text-xs text-gray-600">
+          Already have an account?{" "}
+          <a href="/login" className="text-indigo-600 hover:underline">
+            Log in
+          </a>
         </div>
-
-        <input
-          type="text"
-          name="username"
-          placeholder="Username"
-          value={formData.username}
-          onChange={handleChange}
-          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-400"
-          required
-        />
-
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          value={formData.email}
-          onChange={handleChange}
-          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-400"
-          required
-        />
-
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          value={formData.password}
-          onChange={handleChange}
-          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-400"
-          required
-        />
-
-        <input
-          type="password"
-          name="confirmPassword"
-          placeholder="Retype Password"
-          value={formData.confirmPassword}
-          onChange={handleChange}
-          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-400"
-          required
-        />
-
-        {error && <p className="text-red-500 text-sm text-center">{error}</p>}
-
-        <button
-          type="submit"
-          className="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-3 rounded-xl transition-all duration-200"
-        >
-          {loading? 'Signing up...': 'Create Account'}
-        </button>
-      </form>
+      </div>
     </div>
   );
 };
 
-export default SignupPage;
+export default SignUpPage;

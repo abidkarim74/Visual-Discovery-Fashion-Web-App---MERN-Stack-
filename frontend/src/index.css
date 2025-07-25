@@ -1,3 +1,22 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.notification-bar::-webkit-scrollbar {
+  width: 10px;
+}
+
+.notification-bar::-webkit-scrollbar-track {
+  background: #e0e7ff;
+  border-radius: 10000px;
+}
+
+.notification-bar::-webkit-scrollbar-thumb {
+  background-color: #a5b4fc;
+  border-radius: 9999px;
+  border: 2px solid #e0e7ff;
+
+  /* 👇 Add margin to reduce visual height */
+  margin-top: 100px;
+  margin-bottom: 100px;
+}

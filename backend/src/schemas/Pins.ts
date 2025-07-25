@@ -21,7 +21,7 @@ const commentSchema = new mongoose.Schema({
 const Comment = mongoose.model("Comment", commentSchema);
 
 
-const pinSchema = new mongoose.Schema({
+export const pinSchema = new mongoose.Schema({
   image: {
     type: String,
     required: true

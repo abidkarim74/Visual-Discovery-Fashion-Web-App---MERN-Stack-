@@ -6,8 +6,7 @@ import {
   generateAccessTokenFunc,
   generateRefreshTokenFunc,
 } from "../services/generateTokens.js";
-import { verifyAsync, CustomJwtPayload, AuthenticatedUser, AuthenticatedRequest } from "../interfaces/AuthInterface.js";
-import jwt from 'jsonwebtoken';
+import { verifyAsync, CustomJwtPayload, AuthenticatedRequest } from "../interfaces/AuthInterface.js";
 
 
 export const userRegistFunc = async (req: Request, res: Response) => {
@@ -122,7 +121,7 @@ export const refreshTokenFunc = async (req: Request, res: Response) => {
       return;
     }
     const decoded = await verifyAsync(refreshToken, REFRESH_SECRET) as CustomJwtPayload;
-
+    
     if (!decoded) {
       res.status(403).json({error: 'Invalid user!'});
     }

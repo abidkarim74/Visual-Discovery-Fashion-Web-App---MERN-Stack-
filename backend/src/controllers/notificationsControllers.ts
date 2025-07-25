@@ -5,20 +5,17 @@ import User from "../schemas/User.js";
 import { sendNotificationService } from "../services/sendNotifications.js";
 
 
-export const notificationListFunc = async (
-  req: AuthenticatedRequest,
-  res: Response
-) => {
+export const notificationListFunc = async (req: AuthenticatedRequest,res: Response) => {
   try {
     if (!req) {
-      res
-        .status(401)
-        .json({ error: "You are not authorized to perform this task!" });
+      res.status(401).json({ error: "You are not authorized to perform this task!" });
       return;
     }
     const notifications = await Notification.find({
       target: req.user?.id,
     }).sort("-createdAt");
+
+    console.log(notifications);
 
     res.status(200).json(notifications);
   } catch (err: any) {
@@ -27,15 +24,11 @@ export const notificationListFunc = async (
   }
 };
 
-export const sendNotfictionFunc = async (
-  req: AuthenticatedRequest,
-  res: Response
-) => {
+
+export const sendNotfictionFunc = async (req: AuthenticatedRequest,res: Response) => {
   try {
     if (!req.user) {
-      res
-        .status(401)
-        .json({ error: "You are not authenticated to perform this task!" });
+      res.status(401).json({ error: "You are not authenticated to perform this task!" });
       return;
     }
     const { receiverId, text } = req.body;
@@ -44,7 +37,6 @@ export const sendNotfictionFunc = async (
       res.status(403).json({ error: "You cannot save your own Pins!" });
       return;
     }
-
     const newNotifcation = await Notification.create({
       target: receiverId,
       source: {
@@ -54,31 +46,25 @@ export const sendNotfictionFunc = async (
       },
       text,
     });
-
+    console.log(newNotifcation);
+    
     sendNotificationService(newNotifcation, receiverId);
 
     res.status(201).json("Done");
   } catch (err: any) {
     console.log(err.message);
-    res
-      .status(500)
-      .json({ error: "Internal server while sending a notification!" });
+    res.status(500).json({ error: "Internal server while sending a notification!" });
   }
 };
 
-export const unreadReactNotificationFunc = async (
-  req: AuthenticatedRequest,
-  res: Response
-) => {
+
+export const unreadReactNotificationFunc = async (req: AuthenticatedRequest, res: Response) => {
   try {
     if (!req.user) {
-      console.log('Coming from here...');
-      res
-        .status(401)
-        .json({ error: "You are not authenticated to perform this task!" });
+      res.status(401).json({ error: "You are not authenticated to perform this task!" });
       return;
     }
-    const unreadNotifications = await Notification.find({ seen: false });
+    const unreadNotifications = await Notification.find({ seen: false, target: req.user.id });
     const unreadCount = unreadNotifications.length;
 
     res.status(200).json(unreadCount);

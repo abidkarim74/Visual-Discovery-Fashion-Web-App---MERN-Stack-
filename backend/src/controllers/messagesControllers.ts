@@ -7,22 +7,15 @@ import mongoose, { ObjectId } from "mongoose";
 import { sendMessageService } from "../services/sendRealTimeMessage.js";
 
 
-export const sendMessageFunc = async (
-  req: AuthenticatedRequest,
-  res: Response
-) => {
+
+export const sendMessageFunc = async (req: AuthenticatedRequest, res: Response) => {
   try {
     if (!req.user) {
-      res
-        .status(401)
-        .json({ error: "You are not authorized to perform this task!" });
+      res.status(401).json({ error: "You are not authorized to perform this task!" });
       return;
     }
     const { receiverId, text, conversationId } = req.body;
-
     const receiver = await User.findOne({ _id: receiverId });
-
-    console.log(receiver);
 
     if (!receiver) {
       res.status(404).json({ error: "Receiver user not found!" });
@@ -42,58 +35,46 @@ export const sendMessageFunc = async (
       },
       conversationId,
     });
-
     sendMessageService(newMessage, receiverId, req.user);
 
+    await Conversation.updateOne({ _id: conversationId }, { updatedAt: Date.now() });
+    
     res.status(200).json("Message sent!");
+
   } catch (err: any) {
     console.log(err.message);
-    res
-      .status(500)
-      .json({ error: "Internal server error while sending message!" });
+    res.status(500).json({ error: "Internal server error while sending message!" });
   }
 };
 
 
-export const getConversationsFunc = async (
-  req: AuthenticatedRequest,
-  res: Response
-) => {
+export const getConversationsFunc = async (req: AuthenticatedRequest, res: Response) => {
   try {
     if (!req.user) {
-      res
-        .status(401)
-        .json({ error: "You are not authenticated to perform this task!" });
+      res.status(401).json({ error: "You are not authenticated to perform this task!" });
       return;
     }
     const userId = req.user.id;
 
     const conversations = await Conversation.find({
-    "participants._id": new mongoose.Types.ObjectId(req.user.id)
-    });
-    console.log(conversations);
+      "participants._id": new mongoose.Types.ObjectId(req.user.id)
+    }).sort({ updatedAt: -1 });
 
     res.status(200).json(conversations);
+
   } catch (err: any) {
     console.error(err.message);
-    res
-      .status(500)
-      .json({ error: "Internal server error while fetching conversations!" });
+    res.status(500).json({ error: "Internal server error while fetching conversations!" });
   }
 };
 
-export const createConversationFunc = async (
-  req: AuthenticatedRequest,
-  res: Response
-) => {
+
+export const createConversationFunc = async (req: AuthenticatedRequest, res: Response) => {
   try {
     if (!req.user) {
-      res
-        .status(401)
-        .json({ error: "You are not authorized to perform this task!" });
+      res.status(401).json({ error: "You are not authorized to perform this task!" });
       return;
     }
-
     const { otherId, message } = req.body;
     const receiverUser = await User.findById(otherId);
 
@@ -101,7 +82,6 @@ export const createConversationFunc = async (
       res.status(404).json({ error: "User not found!" });
       return;
     }
-
     let conversation = await Conversation.findOne({
       $and: [
         { "participants._id": new mongoose.Types.ObjectId(req.user.id) },
@@ -141,7 +121,6 @@ export const createConversationFunc = async (
     });
     sendMessageService(newMessage, receiverUser.id, req.user);
 
-
     res.status(200).json({
       message: "Conversation and message created successfully!",
       conversation,
@@ -149,9 +128,7 @@ export const createConversationFunc = async (
     });
   } catch (err: any) {
     console.error(err);
-    res
-      .status(500)
-      .json({ error: "Internal server error while creating conversation!" });
+    res.status(500).json({ error: "Internal server error while creating conversation!" });
   }
 };
 
@@ -164,8 +141,9 @@ export const messagesListFunc = async (req: AuthenticatedRequest, res: Response)
     }
     const { conversationId } = req.params;
     const messages = await Message.find({ conversationId });
-    
+
     console.log(messages);
+
     res.status(200).json(messages);
 
   } catch (err: any) {
@@ -215,3 +193,63 @@ export const deleteChats = async (req: Request, res: Response) => {
     process.exit(1);
   }
 };
+
+
+export const unreadConversationsFunc = async (req: AuthenticatedRequest, res: Response) => {
+  try { 
+    if (!req.user) {
+    res.status(401).json({ error: 'You are not authorized to perform this task!' });
+    return;
+    }
+    const unseenConversations = await Message.aggregate([
+      {
+        $match: {
+          seen: false,
+          "sender._id": { $ne: req.user.id },
+        }
+      },
+    {
+      $group: {
+        _id: "$conversationId"
+      }
+    }
+    ]);
+    const conversationIds = unseenConversations.map(conv => conv._id);
+
+    const conversations = await Conversation.find({
+      _id: { $in: conversationIds },
+        "participants._id": req.user.id 
+    }).populate("participants");
+
+    res.status(200).json(conversations.length);
+    
+  } catch (err: any) {
+    console.log(err.message);
+    res.status(500).json({ error: 'Internal server error while fetching messages!' });
+  }
+}
+
+
+export const readMessagesFunc = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    if (!req.user) {
+      res.status(401).json({ error: 'You are not authorized to perform this task!' });
+      return;
+    }
+    const conversationId = req.body.conversationId;
+    const data = await Message.updateMany(
+      {
+        conversationId: conversationId,
+        "sender._id": { $ne: req.user.id }
+      },
+      {
+        $set: { seen: true }
+      }
+    );
+    res.status(200).json('Messages red successfully!');
+
+  } catch (err: any) {
+    console.log(err.message);
+    res.status(500).json({ error: 'Internal server error while reading chat!' });
+  }
+}

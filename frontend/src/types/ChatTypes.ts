@@ -18,5 +18,7 @@ export interface Conversation {
 
 export interface MessageContextType {
   message: Message | null,
-  setMessage: (value:Message | null) => void
+  setMessage: (value: Message | null) => void
+  unreadCount: number,
+  setUnreadCount: (value: number) => void
 }

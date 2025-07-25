@@ -4,7 +4,6 @@ import { useContext, useEffect, useState } from "react";
 import MainLoading from "./sub/MainLoading";
 import NotificationContext from "../context/notificationContext";
 
-
 const formatTime = (dateStr: string) => {
   const now = new Date();
   const date = new Date(dateStr);
@@ -46,7 +45,6 @@ const NotificationBar = () => {
     setError(null);
 
     const res = await getRequest(endpoint, setLoading, setError);
-    
 
     if (res) {
       for (let i = 0; i < res.length; i++) {
@@ -76,53 +74,55 @@ const NotificationBar = () => {
     readNotification();
   }, [auth]);
 
-  if (loading) {
-    return <div className="p-4">Loading notifications...</div>;
-  }
-
   if (error) {
     return <div className="p-4 text-red-500">Error: {error}</div>;
   }
 
   return (
-    <div className="notification-bar bg-white rounded-xl shadow-lg max-h-[500px] w-full sm:w-[400px] overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-blue-300 scrollbar-track-blue-100">
-      <h3 className="text-xl font-bold border-b pb-2 text-gray-700">
+    <div className="notification-bar bg-white rounded-3xl shadow-lg max-h-[500px] w-full sm:w-[400px] overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-indigo-300 scrollbar-track-indigo-100 border-2 border-indigo-300">
+      <h3 className="text-xl font-semibold text-gray-800 border-b pb-2">
         Notifications
       </h3>
 
-      {notifications.length === 0 ? (
+      {loading ? (
+        <div className="flex items-center justify-center h-40">
+          <div className="w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+        </div>
+      ) : notifications.length === 0 ? (
         <p className="text-gray-500 text-sm">No notifications found.</p>
       ) : (
-        <ul className="space-y-3">
-          {notifications.map((n, idx) => (
-            <li
-              key={idx}
-              className={`p-4 rounded-xl flex items-center gap-3 transition-all duration-200 ${
-                n.seen
-                  ? "bg-gray-50 hover:bg-gray-100"
-                  : "bg-blue-50 hover:bg-blue-100"
-              }`}
-            >
-              <img
-                src={`http://localhost:8080${n.source.profilePic}`}
-                alt={n.source.username}
-                className="w-12 h-12 rounded-full object-cover border border-gray-200"
-              />
-              <div className="flex-1">
-                <p className="text-sm text-gray-800">
-                  <span className="font-semibold">{n.source.username}</span>:{" "}
-                  {n.text}
-                </p>
-                <p className="text-xs text-gray-500 mt-1">
-                  {formatTime(n.createdAt)}
-                </p>
-              </div>
-              {!n.seen && (
-                <span className="ml-auto inline-block w-2.5 h-2.5 bg-blue-500 rounded-full" />
-              )}
-            </li>
-          ))}
-        </ul>
+        <div className="notification-bar">
+          <ul className="space-y-3 ">
+            {notifications.map((n, idx) => (
+              <li
+                key={idx}
+                className={`p-4 rounded-xl flex items-center gap-4 transition-all duration-200 ${
+                  n.seen
+                    ? "bg-gray-50 hover:bg-gray-100"
+                    : "bg-indigo-50 hover:bg-indigo-100"
+                }`}
+              >
+                <img
+                  src={`http://localhost:8080${n.source.profilePic}`}
+                  alt={n.source.username}
+                  className="w-10 h-10 rounded-full object-cover border border-gray-300"
+                />
+                <div className="flex-1">
+                  <p className="text-sm text-gray-800 leading-snug">
+                    <span className="font-semibold">{n.source.username}</span>:{" "}
+                    {n.text}
+                  </p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    {formatTime(n.createdAt)}
+                  </p>
+                </div>
+                {!n.seen && (
+                  <span className="ml-auto w-2.5 h-2.5 bg-indigo-500 rounded-full" />
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
     </div>
   );

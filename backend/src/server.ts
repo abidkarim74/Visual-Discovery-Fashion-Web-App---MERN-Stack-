@@ -11,6 +11,7 @@ import path from 'path';
 import { mainServer, app } from './socket/socketio.js';
 import messageRoutes from './routes/messageRoutes.js';
 import notificationRoutes from './routes/notificationRoutes.js';
+import feedRoutes from './routes/feedRoutes.js';
 
 
 // Constants
@@ -37,6 +38,7 @@ app.use('/api/profiles', profileRoutes);
 app.use('/api/pins', pinRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/feed', feedRoutes);
 
 
 mainServer.listen(PORT, 'localhost', () => {
