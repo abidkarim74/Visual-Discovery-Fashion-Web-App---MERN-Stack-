@@ -5,6 +5,7 @@ import { useContext } from "react";
 import MainLoading from "./MainLoading";
 import { ImArrowLeft } from "react-icons/im";
 import MessageContext from "../../context/messageContext";
+import { Link } from "react-router-dom";
 
 interface Props {
   conversationId: string | null;
@@ -126,7 +127,6 @@ const Chats: React.FC<Props> = ({
         </div>
       </div>
 
-      {/* Message Area */}
       <div
         className="notification-bar flex-1 overflow-y-auto px-5 py-4 space-y-4 scrollbar-thin scrollbar-thumb-indigo-300 scrollbar-track-transparent"
         ref={scrollContainerRef}
@@ -149,11 +149,14 @@ const Chats: React.FC<Props> = ({
               }`}
             >
               {!isSender && (
-                <img
-                  src={`http://localhost:8080${profilePic}`}
-                  alt="Sender"
-                  className="w-8 h-8 rounded-full object-cover border border-gray-300 shadow"
-                />
+                <Link to={`/${msg.sender.username
+                }`}>
+                  <img
+                    src={`http://localhost:8080${profilePic}`}
+                    alt="Sender"
+                    className="w-8 h-8 rounded-full object-cover border border-gray-300 shadow"
+                  />
+                </Link>
               )}
 
               <div
@@ -176,7 +179,6 @@ const Chats: React.FC<Props> = ({
         })}
       </div>
 
-      {/* Input Area */}
       <form
         className="bg-white px-5 py-3 flex items-center gap-3 border-t shadow-inner"
         onSubmit={(e) => {

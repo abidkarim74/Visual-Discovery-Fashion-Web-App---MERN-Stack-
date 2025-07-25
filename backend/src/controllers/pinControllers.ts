@@ -201,3 +201,26 @@ export const authUserPinsFunc = async (req: AuthenticatedRequest, res: Response)
     res.status(500).json({ error: 'Internal server error while fetching pins!' });
   }
 }
+
+
+export const searchPinsFunc = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    if (!req.user) {
+      res.status(401).json({ error: 'You are not authorized to perform this task!' });
+      return;
+    }
+    const query = req.body.searchQuery;
+    
+    const pins = await Pin.find({
+      $or: [
+      { caption: { $regex: query, $options: 'i' } },
+      { tags: { $elemMatch: { $regex: query, $options: 'i' } } }
+      ]
+    });
+    res.status(200).json(pins);
+
+  } catch (err: any) {
+    console.log(err.message);
+    res.status(500).json({ error: 'Internal server error while searching pins!' });
+  }
+}
