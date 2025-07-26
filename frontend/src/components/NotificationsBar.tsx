@@ -3,6 +3,7 @@ import { AuthContext } from "../context/authContext";
 import { useContext, useEffect, useState } from "react";
 import MainLoading from "./sub/MainLoading";
 import NotificationContext from "../context/notificationContext";
+import { Link } from "react-router-dom";
 
 const formatTime = (dateStr: string) => {
   const now = new Date();
@@ -10,7 +11,6 @@ const formatTime = (dateStr: string) => {
   const diffMs = now.getTime() - date.getTime();
   const diffMins = Math.floor(diffMs / 60000);
   const diffHours = Math.floor(diffMins / 60);
-  // const diffDays = Math.floor(diffHours / 24);
 
   if (diffMins < 1) return "just now";
   if (diffMins < 60)
@@ -21,7 +21,11 @@ const formatTime = (dateStr: string) => {
   return date.toLocaleString();
 };
 
-const NotificationBar = () => {
+interface Props {
+  setOpen: (value: boolean) => void
+}
+
+const NotificationBar: React.FC<Props> = ({setOpen}) => {
   const auth = useContext(AuthContext);
 
   if (!auth) {
@@ -31,7 +35,7 @@ const NotificationBar = () => {
   const notificationContext = useContext(NotificationContext);
 
   if (!notificationContext) {
-    return <MainLoading></MainLoading>;
+    return <MainLoading />;
   }
 
   const [loading, setLoading] = useState<boolean>(true);
@@ -52,7 +56,6 @@ const NotificationBar = () => {
           notificationContext.setChecker(true);
         }
       }
-      console.log(res);
       setNotifications(res);
     }
   };
@@ -63,11 +66,8 @@ const NotificationBar = () => {
 
   const readNotification = async () => {
     const endpoint = "/notifications/read";
-    const res = await postRequest(endpoint, {}, setLoading, setError);
-
+    await postRequest(endpoint, {}, setLoading, setError);
     notificationContext.setCount(0);
-
-    console.log(res);
   };
 
   useEffect(() => {
@@ -92,7 +92,7 @@ const NotificationBar = () => {
         <p className="text-gray-500 text-sm">No notifications found.</p>
       ) : (
         <div className="notification-bar">
-          <ul className="space-y-3 ">
+          <ul className="space-y-3">
             {notifications.map((n, idx) => (
               <li
                 key={idx}
@@ -118,6 +118,15 @@ const NotificationBar = () => {
                 </div>
                 {!n.seen && (
                   <span className="ml-auto w-2.5 h-2.5 bg-indigo-500 rounded-full" />
+                )}
+                {n.context && (
+                  <Link
+                    onClick={() => setOpen(false)}
+                    to={n.context}
+                    className="ml-4 text-sm text-indigo-600 hover:underline shrink-0"
+                  >
+                    View
+                  </Link>
                 )}
               </li>
             ))}

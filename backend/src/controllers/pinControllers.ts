@@ -3,6 +3,7 @@ import { Response, Request } from "express";
 import { Pin } from "../schemas/Pins.js";
 import mongoose from "mongoose";
 import User from "../schemas/User.js";
+import { Comment } from "../schemas/Pins.js";
 
 
 export const pinsListFunc = async (req: AuthenticatedRequest, res: Response) => {
@@ -224,3 +225,5 @@ export const searchPinsFunc = async (req: AuthenticatedRequest, res: Response) =
     res.status(500).json({ error: 'Internal server error while searching pins!' });
   }
 }
+
+

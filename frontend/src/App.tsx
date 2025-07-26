@@ -30,6 +30,7 @@ import SavedPage from "./pages/SavedPage";
 function App() {
   const auth = useContext(AuthContext);
 
+
   if (!auth) {
     return <MainLoading></MainLoading>;
   }

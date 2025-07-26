@@ -22,3 +22,15 @@ export interface MessageContextType {
   unreadCount: number,
   setUnreadCount: (value: number) => void
 }
+
+
+export interface Comment {
+  _id?: string;
+  user: {
+    _id: string;
+    username: string;
+    profilePic: string | null;
+  };
+  text: string;
+  createdAt: number;
+}

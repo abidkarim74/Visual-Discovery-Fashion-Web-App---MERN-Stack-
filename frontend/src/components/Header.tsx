@@ -70,7 +70,7 @@ const Header = () => {
         <img
           src={lumspire}
           alt="Lumspire Logo"
-          className="h-8 w-8 object-contain md:h-8 lg:h-10 rounded-full"
+          className="h-11 w-11 object-contain md:h-8 lg:h-10 rounded-full"
         />
       </Link>
       <div className="w-[80%] px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 max-w-screen-xl mx-auto">
@@ -109,7 +109,7 @@ const Header = () => {
       )}
 
       <nav className="relative">
-        <div className="hidden sm:flex gap-4 border-b pb-1">
+        <div className="hidden sm:flex gap-4 mr-8 border-b pb-1">
           <NavLink
             to="/pins/created"
             className={({ isActive }) =>

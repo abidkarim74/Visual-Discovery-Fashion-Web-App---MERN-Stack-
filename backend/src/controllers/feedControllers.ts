@@ -7,9 +7,7 @@ import { Pin } from "../schemas/Pins.js";
 export const savePinFunc = async (req: AuthenticatedRequest, res: Response) => {
   try {
     if (!req.user) {
-      res
-        .status(401)
-        .json({ error: "You are not authorized to perform this task!" });
+      res.status(401).json({ error: "You are not authorized to perform this task!" });
       return;
     }
     const pinId = req.body.id;

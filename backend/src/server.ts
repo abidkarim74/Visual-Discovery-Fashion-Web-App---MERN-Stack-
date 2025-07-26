@@ -12,7 +12,7 @@ import { mainServer, app } from './socket/socketio.js';
 import messageRoutes from './routes/messageRoutes.js';
 import notificationRoutes from './routes/notificationRoutes.js';
 import feedRoutes from './routes/feedRoutes.js';
-
+import commentRoutes from './routes/commentsRoutes.js';
 
 // Constants
 dotenv.config();
@@ -39,6 +39,7 @@ app.use('/api/pins', pinRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/feed', feedRoutes);
+app.use('/api/comments', commentRoutes);
 
 
 mainServer.listen(PORT, 'localhost', () => {

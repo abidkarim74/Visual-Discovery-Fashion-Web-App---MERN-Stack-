@@ -87,7 +87,7 @@ const Sidebar = () => {
 
       {openNotificationBar && (
         <div className="absolute left-20 top-4 z-10">
-          <NotificationBar />
+          <NotificationBar setOpen={setOpenNotificationBar} />
         </div>
       )}
     </div>

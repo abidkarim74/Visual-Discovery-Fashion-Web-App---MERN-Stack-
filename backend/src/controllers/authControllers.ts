@@ -11,6 +11,8 @@ import { verifyAsync, CustomJwtPayload, AuthenticatedRequest } from "../interfac
 
 export const userRegistFunc = async (req: Request, res: Response) => {
   try {
+    console.log(req.body);
+    
     const { firstname, lastname, username, email, password } = req.body;
 
     const existingUser = await User.findOne({
